@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quiz_testtask/ui/widget/question_widget.dart';
-
 import '../../model/quiz/quiz.dart';
 import '../../quiz_api.dart';
 import '../widget/exit_button.dart';
@@ -18,11 +17,13 @@ class QuestionPage extends StatefulWidget {
 
 class _QuestionPageState extends State<QuestionPage> {
   late final _quizApi = Provider.of<QuizApi>(context);
+  late final Future<Quiz> _futureQuiz = _getQuiz();
+  
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Quiz>(
-        future: _getQuiz(),
+        future: _futureQuiz,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Scaffold(

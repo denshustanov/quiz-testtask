@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:provider/provider.dart';
-import 'package:quiz_testtask/model/quiz/question.dart';
 import 'package:quiz_testtask/ui/page/quiz_results_page.dart';
 import 'package:quiz_testtask/ui/widget/exit_button.dart';
 
@@ -22,12 +19,15 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   List<List<bool>> quizAnswers = [];
   int correctAnswersCount = 0;
 
+  late final _isMultipleCorrectAnswers =
+      widget.quiz.questions.elementAt(_currentQuestion).multipleCorrectAnswers;
+
   @override
   void initState() {
+    super.initState();
     selectedAnswers = List.filled(
         widget.quiz.questions.elementAt(_currentQuestion).answers.length,
         false);
-    super.initState();
   }
 
   @override
@@ -68,67 +68,11 @@ class _QuestionWidgetState extends State<QuestionWidget> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(widget.quiz.questions
-                      .elementAt(_currentQuestion)
-                      .multipleCorrectAnswers
+              child: Text(_isMultipleCorrectAnswers
                   ? 'Select multiple answers'
                   : 'Select single answer'),
             ),
-            Expanded(
-              child: ListView.builder(
-                  itemCount: widget.quiz.questions
-                      .elementAt(_currentQuestion)
-                      .answers
-                      .length,
-                  itemBuilder: (context, index) {
-                    String? answer = widget.quiz.questions
-                        .elementAt(_currentQuestion)
-                        .answers
-                        .elementAt(index);
-                    if (answer != null) {
-                      return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GestureDetector(
-                            onTap: () {
-                              answerTapHandler(index);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  color: Colors.blue),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const SizedBox(
-                                    width: 8.0,
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      answer,
-                                      softWrap: true,
-                                      overflow: TextOverflow.visible,
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                  Checkbox(
-                                      checkColor: Colors.white,
-                                      side: MaterialStateBorderSide.resolveWith(
-                                          (states) => const BorderSide(
-                                              width: 1.0, color: Colors.white)),
-                                      value: selectedAnswers.elementAt(index),
-                                      onChanged: (value) {
-                                        answerTapHandler(index);
-                                      })
-                                ],
-                              ),
-                            ),
-                          ));
-                    }
-                    return const SizedBox.shrink();
-                  }),
-            ),
+            _answersList(),
             Center(
               child: ElevatedButton(
                   onPressed: nextQuestionHandler, child: const Text('Next')),
@@ -137,11 +81,9 @@ class _QuestionWidgetState extends State<QuestionWidget> {
         ));
   }
 
-  answerTapHandler(index) {
+  void answerTapHandler(index) {
     setState(() {
-      if (widget.quiz.questions
-          .elementAt(_currentQuestion)
-          .multipleCorrectAnswers) {
+      if (_isMultipleCorrectAnswers) {
         selectedAnswers[index] = !selectedAnswers[index];
       } else {
         selectedAnswers = List.filled(
@@ -158,6 +100,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
       if (correct) {
         correctAnswersCount += 1;
       }
+
       await showModalBottomSheet(
           barrierColor: Colors.white.withOpacity(0),
           isDismissible: false,
@@ -194,6 +137,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
               ),
             );
           });
+
       quizAnswers.add(List.from(selectedAnswers));
       if (_currentQuestion >= widget.quiz.questions.length - 1) {
         final results = createResults();
@@ -228,5 +172,60 @@ class _QuestionWidgetState extends State<QuestionWidget> {
         correctAnswersCount,
         widget.quiz.questions.length - correctAnswersCount,
         DateTime.now());
+  }
+
+  Widget _answersList() {
+    return Expanded(
+      child: ListView.builder(
+          itemCount:
+              widget.quiz.questions.elementAt(_currentQuestion).answers.length,
+          itemBuilder: (context, index) {
+            String? answer = widget.quiz.questions
+                .elementAt(_currentQuestion)
+                .answers
+                .elementAt(index);
+            if (answer != null) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    answerTapHandler(index);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0),
+                        color: Colors.blue),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const SizedBox(
+                          width: 8.0,
+                        ),
+                        Expanded(
+                          child: Text(
+                            answer,
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        Checkbox(
+                            checkColor: Colors.white,
+                            side: MaterialStateBorderSide.resolveWith(
+                                (states) => const BorderSide(
+                                    width: 1.0, color: Colors.white)),
+                            value: selectedAnswers.elementAt(index),
+                            onChanged: (value) {
+                              answerTapHandler(index);
+                            })
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+    );
   }
 }

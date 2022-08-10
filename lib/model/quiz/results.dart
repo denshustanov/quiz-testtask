@@ -1,4 +1,4 @@
-class Results{
+class Results {
   String category;
   String difficulty;
   int correctAnswers;
@@ -6,9 +6,14 @@ class Results{
   DateTime quizDateTime;
 
   Results(
-      this.category, this.difficulty, this.correctAnswers, this.wrongAnswers, this.quizDateTime);
+    this.category,
+    this.difficulty,
+    this.correctAnswers,
+    this.wrongAnswers,
+    this.quizDateTime,
+  );
 
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     return {
       "category": category,
       "difficulty": difficulty,

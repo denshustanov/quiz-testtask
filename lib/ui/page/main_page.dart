@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:quiz_testtask/quiz_api.dart';
 import 'package:quiz_testtask/ui/page/question_page.dart';
 
 class MainPage extends StatefulWidget {

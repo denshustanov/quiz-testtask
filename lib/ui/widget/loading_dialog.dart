@@ -10,16 +10,20 @@ class LoadingDialog extends StatelessWidget {
         return false;
       },
       child: Center(
-          child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              // padding: EdgeInsets.all(20),
-              color: Colors.transparent,
-              child: const Center(
-                  child: SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: CircularProgressIndicator())))),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          // padding: EdgeInsets.all(20),
+          color: Colors.transparent,
+          child: const Center(
+            child: SizedBox(
+              width: 50,
+              height: 50,
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

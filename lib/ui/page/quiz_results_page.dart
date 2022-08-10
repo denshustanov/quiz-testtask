@@ -17,6 +17,9 @@ class _QuizResultsPageState extends State<QuizResultsPage> {
   late final firestoreService =
       Provider.of<FirestoreService>(context, listen: false);
 
+  static const TextStyle _greyLabelStyle = TextStyle(
+      fontSize: 18, color: Colors.grey);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,18 +50,17 @@ class _QuizResultsPageState extends State<QuizResultsPage> {
                 child: Stack(children: [
                   Center(
                     child: CircularProgressIndicator(
-                      value: (widget.results.correctAnswers) /
-                          (widget.results.correctAnswers +
-                              widget.results.wrongAnswers),
+                      value: _quizCorrectAnswersPercentage(),
                       color: Colors.blue,
                       backgroundColor: Colors.grey,
                     ),
                   ),
                   Center(
-                      child: Text(
-                    '${(widget.results.correctAnswers / (widget.results.correctAnswers + widget.results.wrongAnswers) * 100).toStringAsFixed(0)}%',
-                    style: const TextStyle(color: Colors.grey),
-                  ))
+                    child: Text(
+                      '${(_quizCorrectAnswersPercentage() * 100).toStringAsFixed(0)}%',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  )
                 ]),
               ),
             ),
@@ -78,8 +80,7 @@ class _QuizResultsPageState extends State<QuizResultsPage> {
                           padding: const EdgeInsets.only(left: 8.0),
                           child: Text(
                             widget.results.category,
-                            style: const TextStyle(
-                                fontSize: 18, color: Colors.grey),
+                            style: _greyLabelStyle  ,
                           ),
                         ),
                       ],
@@ -94,8 +95,7 @@ class _QuizResultsPageState extends State<QuizResultsPage> {
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: Text(widget.results.difficulty,
-                              style: const TextStyle(
-                                  fontSize: 18, color: Colors.grey)),
+                              style:_greyLabelStyle),
                         ),
                       ],
                     ),
@@ -150,6 +150,13 @@ class _QuizResultsPageState extends State<QuizResultsPage> {
           return const LoadingDialog();
         });
     await firestoreService.addResult(widget.results);
-    Navigator.of(context).popUntil((route) => route.isFirst);
+    if(mounted) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
+  double _quizCorrectAnswersPercentage() {
+    return widget.results.correctAnswers /
+        (widget.results.correctAnswers + widget.results.wrongAnswers);
   }
 }
